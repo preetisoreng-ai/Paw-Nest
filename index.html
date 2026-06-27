@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pawnest — No-Cage Pet Boarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E4E9F5;
+  --surface:#F5F7FC;
+  --surface-2:#FFFFFF;
+  --peach:#EBA876;
+  --peach-deep:#E0925B;
+  --peach-soft:#F6D6BA;
+  --peach-tint:#FBEBDC;
+  --ink:#1C1C22;
+  --muted:#8C8DA0;
+  --line:#E7E9F2;
+  --shadow:0 30px 60px -25px rgba(60,60,90,.35);
+  --shadow-sm:0 12px 30px -12px rgba(60,60,90,.3);
+  --r-lg:34px;
+  --r-md:22px;
+  --r-sm:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Quicksand',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,.fred{font-family:'Fredoka',sans-serif;line-height:1.05}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+button{font-family:inherit;cursor:pointer;border:none}
+
+/* layout shell */
+.shell{
+  max-width:1280px;
+  margin:22px auto;
+  padding:0 16px;
+}
+.panel{
+  position:relative;
+  background:var(--surface);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.blob{position:absolute;border-radius:50%;filter:blur(38px);opacity:.55;z-index:0;pointer-events:none}
+.blob.b1{width:300px;height:300px;background:var(--peach-soft);top:-120px;left:8%}
+.blob.b2{width:240px;height:240px;background:var(--peach-soft);bottom:-90px;left:-70px;opacity:.5}
+.blob.b3{width:200px;height:200px;background:#cdd8f3;top:40%;right:-80px;opacity:.5}
+.pad{position:relative;z-index:1;padding:26px clamp(20px,4vw,56px) clamp(40px,5vw,70px)}
+
+/* nav */
+nav{
+  position:relative;z-index:5;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:18px;padding:8px 0 30px;
+}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Fredoka';font-weight:600;font-size:1.35rem}
+.brand .paw{width:40px;height:40px;flex:0 0 auto}
+.brand b{color:var(--peach-deep);font-weight:700}
+.navlinks{display:flex;gap:clamp(14px,2.4vw,38px);align-items:center}
+.navlinks a{font-weight:600;color:#41414f;font-size:.98rem;transition:color .2s;position:relative}
+.navlinks a:hover{color:var(--peach-deep)}
+.navlinks a.active{color:var(--ink)}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:3px;border-radius:3px;background:var(--peach)}
+.btn{
+  background:var(--peach);color:#fff;font-weight:600;font-family:'Quicksand';
+  padding:13px 26px;border-radius:999px;font-size:1rem;
+  box-shadow:0 10px 22px -8px rgba(224,146,91,.7);
+  transition:transform .15s ease, box-shadow .2s, background .2s;
+}
+.btn:hover{background:var(--peach-deep);transform:translateY(-2px);box-shadow:0 16px 28px -10px rgba(224,146,91,.8)}
+.btn:active{transform:translateY(0)}
+.btn.ghost{background:transparent;color:var(--peach-deep);box-shadow:none;border:2px solid var(--peach-soft)}
+.btn.ghost:hover{background:var(--peach-tint);transform:translateY(-2px)}
+.btn.lg{padding:16px 34px;font-size:1.08rem}
+.menu-toggle{display:none;background:transparent;font-size:1.6rem;color:var(--ink)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:30px;align-items:center}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--peach-tint);color:var(--peach-deep);
+  font-weight:700;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;
+  padding:8px 16px;border-radius:999px;margin-bottom:20px;
+}
+.hero h1{
+  font-size:clamp(2.7rem,6.4vw,5rem);font-weight:700;letter-spacing:-.01em;
+}
+.hero h1 .accent{color:var(--peach-deep);display:block}
+.hero p.lead{
+  color:#5a5b6b;font-size:clamp(1.02rem,1.4vw,1.18rem);font-weight:500;
+  max-width:430px;margin:22px 0 30px;
+}
+.cta-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.linklike{display:inline-flex;align-items:center;gap:9px;font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--peach)}
+.linklike svg{color:var(--peach-deep)}
+.trust{display:flex;gap:26px;margin-top:34px;flex-wrap:wrap}
+.trust .t-num{font-family:'Fredoka';font-weight:700;font-size:1.7rem;color:var(--ink)}
+.trust .t-lbl{font-size:.86rem;color:var(--muted);font-weight:600}
+
+/* hero art */
+.hero-art{position:relative;min-height:440px}
+.disc{position:absolute;border-radius:50%;overflow:hidden;background:var(--surface-2);box-shadow:var(--shadow-sm)}
+.disc.big{width:74%;height:80%;left:13%;top:8%;background:var(--peach-soft)}
+.disc.sm1{width:42%;height:42%;left:-4%;bottom:2%;z-index:2;border:6px solid var(--surface)}
+.disc.sm2{width:38%;height:38%;right:-2%;bottom:8%;z-index:2;border:6px solid var(--surface)}
+.disc svg{position:absolute;inset:0;width:100%;height:100%}
+.disc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.disc.sm1,.disc.sm2{border:6px solid var(--surface)}
+.food-row{position:absolute;top:30px;right:-6px;display:flex;gap:10px;z-index:3}
+.food{width:58px;height:58px;border-radius:50%;background:var(--surface-2);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;border:3px solid #fff}
+.food svg{width:34px;height:34px}
+
+/* animation */
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes wag{0%,100%{transform:rotate(0)}50%{transform:rotate(12deg)}}
+.floaty{animation:floaty 5s ease-in-out infinite}
+.eye-lid{transform-origin:center;animation:blink 5.5s infinite}
+.tail{transform-origin:bottom center;animation:wag 1.6s ease-in-out infinite}
+
+/* generic section */
+section{position:relative;z-index:1}
+.sec{padding:clamp(56px,7vw,96px) 0 0}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 46px}
+.sec-head .eyebrow{margin-bottom:14px}
+.sec-head h2{font-size:clamp(2rem,3.6vw,2.9rem);font-weight:700}
+.sec-head p{color:var(--muted);margin-top:12px;font-weight:500;font-size:1.05rem}
+
+/* promise cards */
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{
+  background:var(--surface-2);border-radius:var(--r-md);padding:32px 28px;
+  box-shadow:var(--shadow-sm);transition:transform .2s ease, box-shadow .2s;
+  border:1px solid var(--line);
+}
+.card:hover{transform:translateY(-6px);box-shadow:0 24px 44px -20px rgba(60,60,90,.4)}
+.icon-badge{width:64px;height:64px;border-radius:18px;background:var(--peach-tint);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.icon-badge svg{width:34px;height:34px;color:var(--peach-deep)}
+.card h3{font-size:1.35rem;font-weight:600;margin-bottom:8px}
+.card p{color:var(--muted);font-weight:500;font-size:.98rem}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.step{text-align:center;position:relative;padding:14px}
+.step .num{
+  width:54px;height:54px;border-radius:50%;background:var(--peach);color:#fff;
+  font-family:'Fredoka';font-weight:700;font-size:1.3rem;display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;box-shadow:0 10px 20px -8px rgba(224,146,91,.7);
+}
+.step h4{font-family:'Fredoka';font-weight:600;font-size:1.15rem;margin-bottom:6px}
+.step p{color:var(--muted);font-size:.92rem;font-weight:500}
+
+/* pricing */
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
+.price-card{
+  background:var(--surface-2);border-radius:var(--r-md);padding:34px 30px;
+  box-shadow:var(--shadow-sm);border:2px solid var(--line);display:flex;flex-direction:column;
+  transition:transform .2s, box-shadow .2s, border-color .2s;
+}
+.price-card:hover{transform:translateY(-6px)}
+.price-card.featured{border-color:var(--peach);background:linear-gradient(180deg,var(--peach-tint),var(--surface-2))}
+.pc-tag{display:inline-block;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--peach-deep);background:#fff;padding:6px 12px;border-radius:999px;align-self:flex-start;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.price-card .pet-ico{width:70px;height:70px;margin-bottom:8px}
+.price-card img.pet-ico{border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:var(--shadow-sm)}
+.price-card h3{font-size:1.5rem;font-weight:600}
+.price-card .size-note{color:var(--muted);font-weight:500;font-size:.9rem;margin-bottom:18px}
+.amount{font-family:'Fredoka';font-weight:700;font-size:2.6rem;color:var(--ink)}
+.amount span{font-size:1rem;color:var(--muted);font-family:'Quicksand';font-weight:600}
+.feat-list{list-style:none;margin:20px 0 26px;display:flex;flex-direction:column;gap:11px}
+.feat-list li{display:flex;gap:10px;align-items:flex-start;color:#4a4b5a;font-weight:500;font-size:.96rem}
+.feat-list li svg{flex:0 0 auto;width:20px;height:20px;color:var(--peach-deep);margin-top:2px}
+.price-card .btn{margin-top:auto;text-align:center}
+
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.gcard{
+  border-radius:var(--r-md);overflow:hidden;background:var(--peach-tint);
+  aspect-ratio:1;position:relative;box-shadow:var(--shadow-sm);
+  display:flex;align-items:flex-end;justify-content:center;
+  transition:transform .2s ease;
+}
+.gcard:nth-child(2){background:#dfe6f7}
+.gcard:nth-child(3){background:#f7e6e0}
+.gcard:nth-child(4){background:#e7f0e6}
+.gcard:hover{transform:translateY(-6px) rotate(-1deg)}
+.gcard svg{width:90%;height:90%}
+.gcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.gcard .cap{z-index:2}
+.gcard .cap{position:absolute;top:14px;left:14px;background:rgba(255,255,255,.85);backdrop-filter:blur(4px);font-weight:700;font-size:.82rem;padding:5px 12px;border-radius:999px;color:var(--peach-deep)}
+
+/* final cta */
+.bigcta{
+  margin-top:clamp(56px,7vw,96px);
+  background:linear-gradient(120deg,var(--peach),#f0bd92);
+  border-radius:var(--r-lg);padding:clamp(40px,6vw,72px);text-align:center;position:relative;overflow:hidden;
+}
+.bigcta h2{color:#fff;font-size:clamp(2rem,4vw,3rem);font-weight:700}
+.bigcta p{color:#fff;opacity:.92;font-weight:500;margin:14px auto 28px;max-width:520px;font-size:1.08rem}
+.bigcta .btn{background:#fff;color:var(--peach-deep)}
+.bigcta .btn:hover{background:var(--ink);color:#fff}
+.bigcta .paw-bg{position:absolute;opacity:.13;color:#fff}
+.bigcta .paw-bg.p1{width:140px;top:-30px;left:-20px;transform:rotate(-20deg)}
+.bigcta .paw-bg.p2{width:120px;bottom:-30px;right:30px;transform:rotate(25deg)}
+
+/* footer */
+footer{padding:46px clamp(20px,4vw,56px);display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;color:var(--muted);font-weight:500;font-size:.92rem}
+footer .brand{font-size:1.15rem}
+
+/* ===== admin link + dashboard ===== */
+.admin-link{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.9rem;color:#6b6c7e;border:2px solid var(--line);padding:8px 16px;border-radius:999px;transition:all .2s}
+.admin-link:hover{border-color:var(--peach);color:var(--peach-deep);background:var(--peach-tint)}
+.admin-link svg{width:15px;height:15px}
+.login-card{max-width:430px}
+.login-icon{width:66px;height:66px;border-radius:50%;background:var(--peach-tint);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.login-icon svg{width:32px;height:32px;color:var(--peach-deep)}
+.login-err{color:#d05a5a;font-weight:600;font-size:.88rem;margin:10px 0;text-align:center;min-height:18px}
+
+.admin-page{position:fixed;inset:0;height:100vh;height:100dvh;background:var(--bg);z-index:120;overflow:hidden;display:none;flex-direction:column}
+.admin-page.open{display:flex}
+.admin-top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px clamp(18px,4vw,48px);background:var(--surface);border-bottom:1px solid var(--line);flex:0 0 auto;z-index:2}
+.admin-back{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.94rem;color:var(--peach-deep);border:2px solid var(--peach-soft);padding:10px 20px;border-radius:999px;transition:all .2s;white-space:nowrap}
+.admin-back:hover{background:var(--peach);color:#fff;border-color:var(--peach)}
+.admin-back svg{width:16px;height:16px}
+.admin-body{padding:clamp(22px,4vw,44px);max-width:1560px;margin:0 auto;width:100%;flex:1;min-height:0;display:flex;flex-direction:column}
+.admin-head-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:24px;flex:0 0 auto}
+.admin-head-row h1{font-size:clamp(1.7rem,3vw,2.4rem);font-weight:700}
+.admin-head-row p{color:var(--muted);font-weight:500;margin-top:4px}
+.admin-stats{display:flex;gap:12px;flex-wrap:wrap}
+.stat-pill{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:10px 20px;text-align:center;box-shadow:var(--shadow-sm)}
+.stat-pill .n{font-family:'Fredoka';font-weight:700;font-size:1.5rem;display:block;line-height:1.1}
+.stat-pill .l{font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.stat-pill.pend .n{color:var(--peach-deep)}
+.stat-pill.appr .n{color:#2f8a52}
+.stat-pill.rej .n{color:#c34f4f}
+.table-wrap{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow-sm);overflow:auto;flex:1;min-height:0}
+.req-table{width:100%;border-collapse:collapse;min-width:880px}
+.req-table thead th{text-align:left;font-weight:700;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;color:#7a7b8c;padding:14px 14px;border-bottom:2px solid var(--line);background:var(--peach-tint);white-space:nowrap;position:sticky;top:0;z-index:1}
+.req-table tbody td{padding:14px 14px;border-bottom:1px solid var(--line);font-weight:500;font-size:.92rem;color:#3a3b4a;vertical-align:middle}
+.req-table tbody tr:last-child td{border-bottom:none}
+.req-table tbody tr:hover{background:#fafbff}
+.req-table td:nth-child(5),.req-table th:nth-child(5){white-space:nowrap}
+.req-table td:nth-child(2){overflow-wrap:anywhere}
+.req-table th:last-child,.req-table td:last-child{text-align:right}
+.req-table td:last-child .act{justify-content:flex-end}
+.req-pet{font-family:'Fredoka';font-weight:600;color:var(--ink);font-size:1rem}
+.req-sub{color:var(--muted);font-size:.8rem}
+.badge{display:inline-block;padding:5px 13px;border-radius:999px;font-weight:700;font-size:.76rem;text-transform:capitalize}
+.badge.pending{background:var(--peach-tint);color:var(--peach-deep)}
+.badge.approved{background:#e3f5ea;color:#2f8a52}
+.badge.rejected{background:#fbe6e6;color:#c34f4f}
+.act{display:flex;gap:8px}
+.act button{border-radius:10px;padding:8px 13px;font-weight:700;font-size:.83rem;border:2px solid transparent;transition:all .15s;white-space:nowrap}
+.act .approve{background:#e3f5ea;color:#2f8a52}
+.act .approve:hover{background:#2f8a52;color:#fff}
+.act .reject{background:#fbe6e6;color:#c34f4f}
+.act .reject:hover{background:#c34f4f;color:#fff}
+.act button.active-approve{background:#2f8a52;color:#fff;box-shadow:0 6px 14px -6px #2f8a52}
+.act button.active-reject{background:#c34f4f;color:#fff;box-shadow:0 6px 14px -6px #c34f4f}
+.act.act-revoke{flex-direction:column;align-items:flex-end;gap:5px}
+.act .revoke{background:#eef0f7;color:#54556a;border:2px solid var(--line)}
+.act .revoke:hover:not(:disabled){background:#54556a;color:#fff;border-color:#54556a}
+.act .revoke:disabled{opacity:.45;cursor:not-allowed}
+.revoke-note{font-size:.72rem;color:var(--muted);font-weight:600;line-height:1.35;max-width:190px;text-align:right}
+.empty-row td{text-align:center;color:var(--muted);padding:46px;font-weight:500}
+.admin-note{font-size:.82rem;color:var(--muted);margin-top:14px;font-weight:500;line-height:1.5;flex:0 0 auto}
+
+/* tabs */
+.admin-tabs{display:flex;gap:6px;flex:0 0 auto;margin-bottom:22px;border-bottom:1px solid var(--line)}
+.adm-tab{display:inline-flex;align-items:center;gap:8px;background:transparent;color:#6b6c7e;font-weight:700;font-size:.96rem;padding:11px 18px;border-radius:12px 12px 0 0;border:none;border-bottom:3px solid transparent;margin-bottom:-1px;transition:all .18s}
+.adm-tab svg{width:17px;height:17px}
+.adm-tab:hover{color:var(--peach-deep);background:var(--peach-tint)}
+.adm-tab.active{color:var(--peach-deep);border-bottom-color:var(--peach)}
+.tab-panel{display:none;flex:1;min-height:0}
+.tab-panel.active{display:flex;flex-direction:column}
+
+/* secret vault */
+.settings-scroll{flex:1;min-height:0;overflow-y:auto;padding-right:4px}
+.db-card{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:22px;max-width:640px}
+.db-status{display:inline-block;font-weight:700;font-size:.86rem;padding:7px 14px;border-radius:999px;margin-bottom:18px}
+.db-status.on{background:#e3f5ea;color:#2f8a52}
+.db-status.off{background:#fbe6e6;color:#c34f4f}
+.db-actions{display:flex;gap:10px;flex-wrap:wrap}
+.db-err{color:#c34f4f;font-weight:600;font-size:.86rem;margin-top:10px;min-height:14px}
+.db-hint{font-size:.82rem;color:var(--muted);font-weight:500;line-height:1.5;margin-top:12px}
+.db-hint b{color:#6a5a48}
+.vault-head h1{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:700}
+.vault-head p{color:var(--muted);font-weight:500;margin:4px 0 18px;max-width:640px}
+.vault-warning{display:flex;gap:12px;background:#fff6ec;border:1px solid var(--peach-soft);border-radius:16px;padding:16px 18px;margin-bottom:22px;max-width:900px}
+.vault-warning svg{width:22px;height:22px;color:var(--peach-deep);flex:0 0 auto;margin-top:2px}
+.vault-warning div{font-size:.9rem;color:#6a5a48;font-weight:500;line-height:1.5}
+.vault-warning b{color:#b9702f}
+.vault-card{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:22px;max-width:900px}
+.vault-add{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.va-field{display:flex;flex-direction:column;flex:1 1 150px;min-width:140px}
+.va-field.grow{flex:2 1 220px}
+.va-field label{font-weight:600;font-size:.84rem;color:#54556a;margin-bottom:6px}
+.va-field input{font-family:'Quicksand';font-weight:600;font-size:.95rem;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:12px;padding:11px 13px;transition:border-color .2s,box-shadow .2s;width:100%}
+.va-field input:focus{outline:none;border-color:var(--peach);box-shadow:0 0 0 4px var(--peach-tint)}
+.vault-add .btn{padding:12px 22px;flex:0 0 auto}
+.vault-empty{color:var(--muted);font-weight:500;text-align:center;padding:26px;font-size:.95rem}
+.vault-list{display:flex;flex-direction:column}
+.vault-row{display:flex;align-items:center;gap:14px;padding:14px 6px;border-bottom:1px solid var(--line)}
+.vault-row:last-child{border-bottom:none}
+.vault-platform{font-weight:700;color:var(--ink);min-width:160px;display:flex;align-items:center;gap:9px}
+.vault-platform .dot{width:9px;height:9px;border-radius:50%;background:var(--peach);flex:0 0 auto}
+.vault-platform small{display:block;color:var(--muted);font-weight:600;font-size:.78rem}
+.vault-val{flex:1;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9rem;color:#4a4b5a;word-break:break-all;letter-spacing:.02em}
+.vault-actions{display:flex;gap:6px;flex:0 0 auto}
+.vault-actions button{width:36px;height:36px;border-radius:10px;background:var(--peach-tint);color:var(--peach-deep);display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
+.vault-actions button:hover{background:var(--peach);color:#fff}
+.vault-actions button svg{width:17px;height:17px}
+.vault-actions button.ok{background:#2f8a52;color:#fff}
+.vault-actions button.del{background:#fbe6e6;color:#c34f4f}
+.vault-actions button.del:hover{background:#c34f4f;color:#fff}
+@media(max-width:640px){.vault-add .btn{width:100%}.vault-row{flex-wrap:wrap}.vault-platform{min-width:100%}.vault-val{min-width:60%}}
+@media(max-width:560px){.admin-top .brand span{display:none}}
+
+/* ===== modal ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(28,28,40,.55);backdrop-filter:blur(6px);
+  display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;
+  opacity:0;visibility:hidden;transition:opacity .25s;z-index:100;overflow-y:auto;
+}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal{
+  background:var(--surface);border-radius:28px;max-width:620px;width:100%;
+  margin:auto;box-shadow:0 40px 80px -20px rgba(20,20,40,.5);
+  transform:translateY(20px) scale(.98);transition:transform .3s ease;position:relative;overflow:hidden;
+}
+.modal-overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-head{padding:28px 30px 18px;background:linear-gradient(120deg,var(--peach-tint),var(--surface));position:relative}
+.modal-head h2{font-size:1.7rem;font-weight:700}
+.modal-head p{color:var(--muted);font-weight:500;font-size:.96rem;margin-top:4px}
+.modal-close{position:absolute;top:20px;right:20px;width:38px;height:38px;border-radius:50%;background:#fff;color:var(--ink);font-size:1.2rem;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);transition:transform .15s,background .2s}
+.modal-close:hover{background:var(--peach);color:#fff;transform:rotate(90deg)}
+.modal-body{padding:24px 30px 30px}
+.fieldset-title{font-family:'Fredoka';font-weight:600;font-size:1.05rem;color:var(--peach-deep);margin:6px 0 14px;display:flex;align-items:center;gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{margin-bottom:14px;display:flex;flex-direction:column}
+.field label{font-weight:600;font-size:.86rem;color:#54556a;margin-bottom:6px}
+.field input,.field select{
+  font-family:'Quicksand';font-weight:600;font-size:.98rem;color:var(--ink);
+  background:#fff;border:2px solid var(--line);border-radius:13px;padding:12px 14px;
+  transition:border-color .2s,box-shadow .2s;width:100%;
+}
+.field input:focus,.field select:focus{outline:none;border-color:var(--peach);box-shadow:0 0 0 4px var(--peach-tint)}
+.field input.err,.field select.err{border-color:#e07a7a;box-shadow:0 0 0 4px #fbe3e3}
+#ownerName,#petName{text-transform:capitalize}
+.seg{display:flex;gap:10px}
+.seg label{flex:1;cursor:pointer;margin:0}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg .chip{
+  display:block;text-align:center;padding:12px 8px;border-radius:13px;border:2px solid var(--line);
+  background:#fff;font-weight:700;font-size:.92rem;color:#54556a;transition:all .18s;
+}
+.seg .chip small{display:block;font-weight:600;font-size:.74rem;color:var(--muted);margin-top:2px}
+.seg input:checked + .chip{border-color:var(--peach);background:var(--peach-tint);color:var(--peach-deep)}
+.seg input:focus-visible + .chip{box-shadow:0 0 0 4px var(--peach-tint)}
+.summary{
+  background:var(--peach-tint);border-radius:16px;padding:16px 18px;margin:18px 0 6px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+}
+.summary .s-lbl{font-weight:600;color:var(--peach-deep);font-size:.92rem}
+.summary .s-lbl b{display:block;color:var(--ink);font-size:.82rem;font-weight:600;opacity:.7}
+.summary .s-amt{font-family:'Fredoka';font-weight:700;font-size:2rem;color:var(--ink)}
+.summary .s-amt small{font-size:.85rem;color:var(--muted);font-family:'Quicksand'}
+.modal .btn.lg{width:100%;margin-top:8px}
+.hint{font-size:.8rem;color:var(--muted);margin-top:8px;text-align:center;font-weight:500}
+
+/* success */
+.success{text-align:center;padding:50px 30px}
+.success .check{width:90px;height:90px;margin:0 auto 20px}
+.success h2{font-size:1.9rem;margin-bottom:10px}
+.success p{color:var(--muted);font-weight:500;max-width:420px;margin:0 auto 22px}
+.success .recap{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;text-align:left;max-width:420px;margin:0 auto 24px;font-weight:600;font-size:.94rem}
+.success .recap div{display:flex;justify-content:space-between;padding:5px 0;color:#54556a}
+.success .recap div span{color:var(--ink)}
+
+/* responsive */
+@media(max-width:980px){
+  .hero{grid-template-columns:1fr;text-align:center}
+  .hero .eyebrow,.hero .cta-row,.trust{justify-content:center}
+  .hero p.lead{margin-left:auto;margin-right:auto}
+  .hero-art{min-height:380px;max-width:480px;margin:0 auto;width:100%}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .gallery{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+  .navlinks{
+    position:fixed;inset:0 0 0 auto;width:min(76vw,300px);background:var(--surface);
+    flex-direction:column;justify-content:center;gap:26px;padding:40px;z-index:60;
+    transform:translateX(110%);transition:transform .3s ease;box-shadow:-20px 0 50px -20px rgba(0,0,0,.3);
+  }
+  .navlinks.open{transform:translateX(0)}
+  .navlinks .btn{width:100%;text-align:center}
+  .menu-toggle{display:block;z-index:61}
+  .cards3,.pricing{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .shell{margin:10px auto}
+  .grid2{grid-template-columns:1fr}
+  .seg{flex-direction:column}
+  .modal-body{padding:20px}
+  .hero h1{font-size:2.5rem}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="panel">
+  <span class="blob b1"></span>
+  <span class="blob b2"></span>
+  <span class="blob b3"></span>
+  <div class="pad">
+
+    <!-- NAV -->
+    <nav>
+      <a href="#" class="brand">
+        <svg class="paw" viewBox="0 0 48 48" fill="none"><g fill="#EBA876"><ellipse cx="24" cy="32" rx="11" ry="9"/><ellipse cx="12" cy="20" rx="4.5" ry="6"/><ellipse cx="20" cy="14" rx="4.5" ry="6"/><ellipse cx="28" cy="14" rx="4.5" ry="6"/><ellipse cx="36" cy="20" rx="4.5" ry="6"/></g></svg>
+        Paw<b>nest</b>
+      </a>
+      <div class="navlinks" id="navlinks">
+        <a href="#home" class="active">Home</a>
+        <a href="#promise">Why Us</a>
+        <a href="#how">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#gallery">Guests</a>
+        <a href="#" class="admin-link" id="adminLink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Admin</a>
+      </div>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+      <div>
+        <span class="eyebrow">🐾 Cage-free pet boarding</span>
+        <h1>No Cages.<span class="accent">Just Cuddles.</span></h1>
+        <p class="lead">Your dog or cat checks in for a sleepover, not a sentence. Free roam, real beds, belly rubs on demand, and a human awake all night long.</p>
+        <div class="cta-row">
+          <button class="btn lg book-btn">Book a Slot</button>
+          <a href="#how" class="linklike">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            See how it works
+          </a>
+        </div>
+        <div class="trust">
+          <div><div class="t-num">0</div><div class="t-lbl">Cages, ever</div></div>
+          <div><div class="t-num">24/7</div><div class="t-lbl">Awake humans</div></div>
+          <div><div class="t-num">3.4k+</div><div class="t-lbl">Happy tails</div></div>
+        </div>
+      </div>
+
+      <div class="hero-art">
+        <div class="disc big floaty">
+          <img src="https://images.unsplash.com/photo-1615497001839-b0a0eac3274c?q=80&w=700&auto=format&fit=crop" alt="Orange tabby cat relaxing in a basket">
+        </div>
+        <div class="disc sm1 floaty" style="animation-delay:.6s">
+          <img src="https://images.unsplash.com/photo-1582456891925-a53965520520?q=80&w=400&auto=format&fit=crop&crop=faces" alt="Fluffy brown Pomeranian puppy">
+        </div>
+        <div class="disc sm2 floaty" style="animation-delay:1.1s">
+          <img src="https://images.unsplash.com/photo-1529778873920-4da4926a72c2?q=80&w=400&auto=format&fit=crop&crop=faces" alt="Brown tabby kitten">
+        </div>
+        <div class="food-row">
+          <div class="food"><svg viewBox="0 0 32 32"><circle cx="16" cy="20" r="11" fill="#F4B97E"/><circle cx="11" cy="18" r="2.6" fill="#8a5a2a"/><circle cx="18" cy="16" r="2.6" fill="#8a5a2a"/><circle cx="20" cy="22" r="2.6" fill="#8a5a2a"/><circle cx="13" cy="23" r="2.6" fill="#8a5a2a"/></svg></div>
+          <div class="food"><svg viewBox="0 0 32 32"><rect x="8" y="9" width="16" height="18" rx="3" fill="#7fa8e0"/><circle cx="16" cy="16" r="4" fill="#fff"/><path d="M12 24h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="food"><svg viewBox="0 0 32 32"><path d="M16 7 C10 7 7 12 8 18 C9 24 13 26 16 26 C19 26 23 24 24 18 C25 12 22 7 16 7Z" fill="#EBA876"/><circle cx="13" cy="16" r="1.8" fill="#fff"/><circle cx="19" cy="16" r="1.8" fill="#fff"/></svg></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROMISE -->
+    <section class="sec" id="promise">
+      <div class="sec-head">
+        <span class="eyebrow">Our pinky-paw promise</span>
+        <h2>Boarding that feels like home</h2>
+        <p>No locked crates, no lonely corners. Just open rooms, soft blankets, and people who actually like belly rubs.</p>
+      </div>
+      <div class="cards3">
+        <div class="card">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/><path d="M7 3v18M17 3v18" stroke-dasharray="3 4"/><path d="M2 2l20 20" stroke-width="2.6"/></svg></div>
+          <h3>Zero cages</h3>
+          <p>Pets free-roam in cozy, sunlit rooms grouped by size and temperament. The only bars here are on the candy.</p>
+        </div>
+        <div class="card">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9C.8 8.6 2.4 5 6 5c2 0 3.2 1.2 4 2.3C10.8 6.2 12 5 14 5c3.6 0 5.2 3.6 3.5 7-2.5 4.5-9.5 9-9.5 9z"/></svg></div>
+          <h3>Endless love</h3>
+          <p>Daily play sessions, lap time, and one-on-one cuddles. Every guest gets a name tag and a fan club.</p>
+        </div>
+        <div class="card">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <h3>Round-the-clock care</h3>
+          <p>A caretaker is awake every hour of the night, plus live photo updates so you can spy on the cuteness.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW -->
+    <section class="sec" id="how">
+      <div class="sec-head">
+        <span class="eyebrow">Four easy steps</span>
+        <h2>From booking to belly rubs</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><h4>Pick your dates</h4><p>Tell us when your buddy is checking in and out.</p></div>
+        <div class="step"><div class="num">2</div><h4>Add their details</h4><p>Breed, size, name — so we prep the perfect room.</p></div>
+        <div class="step"><div class="num">3</div><h4>Drop them off</h4><p>A meet-and-greet, a sniff-around, then the fun begins.</p></div>
+        <div class="step"><div class="num">4</div><h4>Get photo updates</h4><p>Daily snaps of your spoiled, very-much-loved pet.</p></div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="sec" id="pricing">
+      <div class="sec-head">
+        <span class="eyebrow">Priced by paw-size</span>
+        <h2>Simple per-night pricing</h2>
+        <p>Pick the size that matches your pet. Bigger buddy, bigger bed, bigger snack budget — that's the only difference.</p>
+      </div>
+      <div class="pricing">
+        <div class="price-card">
+          <img class="pet-ico" src="https://images.unsplash.com/photo-1582456891925-a53965520520?q=80&w=160&auto=format&fit=crop&crop=faces" alt="Small dog">
+          <h3>Small</h3>
+          <div class="size-note">Up to 10 kg · kittens, pups, tiny breeds</div>
+          <div class="amount">₹600<span>/night</span></div>
+          <ul class="feat-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Cozy free-roam suite</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>3 play sessions a day</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Daily photo updates</li>
+          </ul>
+          <button class="btn book-btn" data-size="small">Book small</button>
+        </div>
+        <div class="price-card featured">
+          <span class="pc-tag">Most booked</span>
+          <img class="pet-ico" src="https://images.unsplash.com/photo-1615497001839-b0a0eac3274c?q=80&w=160&auto=format&fit=crop&crop=faces" alt="Medium pet, an orange tabby cat">
+          <h3>Medium</h3>
+          <div class="size-note">10–25 kg · beagles, cats, spaniels</div>
+          <div class="amount">₹900<span>/night</span></div>
+          <ul class="feat-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Spacious free-roam room</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>4 play + 1 garden walk</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Live video check-ins</li>
+          </ul>
+          <button class="btn book-btn" data-size="medium">Book medium</button>
+        </div>
+        <div class="price-card">
+          <img class="pet-ico" src="https://images.unsplash.com/photo-1626736637845-53045bb9695b?q=80&w=160&auto=format&fit=crop&crop=faces" alt="Large dog, a golden retriever">
+          <h3>Large</h3>
+          <div class="size-note">25 kg+ · labs, retrievers, big goofballs</div>
+          <div class="amount">₹1300<span>/night</span></div>
+          <ul class="feat-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Extra-large suite + yard</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>5 play + 2 long walks</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Live video + nightly call</li>
+          </ul>
+          <button class="btn book-btn" data-size="large">Book large</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="sec" id="gallery">
+      <div class="sec-head">
+        <span class="eyebrow">Recent guests</span>
+        <h2>Our hall of floof</h2>
+        <p>A few of the very serious, very professional residents currently checked in.</p>
+      </div>
+      <div class="gallery">
+        <div class="gcard">
+          <span class="cap">Mister Biscuit</span>
+          <img src="https://images.unsplash.com/photo-1587402092301-725e37c70fd8?q=80&w=500&auto=format&fit=crop&crop=faces" alt="White Pomeranian puppy">
+        </div>
+        <div class="gcard">
+          <span class="cap">Sir Wigglebutt</span>
+          <img src="https://images.unsplash.com/photo-1626736637845-53045bb9695b?q=80&w=500&auto=format&fit=crop&crop=faces" alt="Golden retriever puppy">
+        </div>
+        <div class="gcard">
+          <span class="cap">Duchess Mittens</span>
+          <img src="https://images.unsplash.com/photo-1611267254323-4db7b39c732c?q=80&w=500&auto=format&fit=crop&crop=faces" alt="Brown tabby kitten lying down">
+        </div>
+        <div class="gcard">
+          <span class="cap">Captain Zoomies</span>
+          <img src="https://images.unsplash.com/photo-1775018118638-f5d3a8c60f39?q=80&w=500&auto=format&fit=crop&crop=faces" alt="Happy corgi with tongue out">
+        </div>
+      </div>
+    </section>
+
+    <!-- BIG CTA -->
+    <section class="bigcta">
+      <svg class="paw-bg p1" viewBox="0 0 48 48" fill="currentColor"><ellipse cx="24" cy="32" rx="11" ry="9"/><ellipse cx="12" cy="20" rx="4.5" ry="6"/><ellipse cx="20" cy="14" rx="4.5" ry="6"/><ellipse cx="28" cy="14" rx="4.5" ry="6"/><ellipse cx="36" cy="20" rx="4.5" ry="6"/></svg>
+      <svg class="paw-bg p2" viewBox="0 0 48 48" fill="currentColor"><ellipse cx="24" cy="32" rx="11" ry="9"/><ellipse cx="12" cy="20" rx="4.5" ry="6"/><ellipse cx="20" cy="14" rx="4.5" ry="6"/><ellipse cx="28" cy="14" rx="4.5" ry="6"/><ellipse cx="36" cy="20" rx="4.5" ry="6"/></svg>
+      <h2>Ready for a cage-free stay?</h2>
+      <p>Spots fill up fast — especially on weekends and holidays. Reserve your pet's room in under two minutes.</p>
+      <button class="btn lg book-btn">Book a Slot</button>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <a href="#" class="brand"><svg class="paw" viewBox="0 0 48 48" fill="#EBA876"><ellipse cx="24" cy="32" rx="11" ry="9"/><ellipse cx="12" cy="20" rx="4.5" ry="6"/><ellipse cx="20" cy="14" rx="4.5" ry="6"/><ellipse cx="28" cy="14" rx="4.5" ry="6"/><ellipse cx="36" cy="20" rx="4.5" ry="6"/></svg>Paw<b style="color:var(--peach-deep)">nest</b></a>
+      <span>No cages. Just cuddles. · Photos via Unsplash · Made with 🐾 in Bengaluru</span>
+      <span>© 2026 Pawnest Boarding</span>
+    </footer>
+
+  </div>
+</div>
+</div>
+
+<!-- ===== BOOKING MODAL ===== -->
+<div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-head">
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      <h2 id="modalTitle">Book your pet's stay</h2>
+      <p>Tell us about you and your floof — we'll have a room ready.</p>
+    </div>
+
+    <div class="modal-body" id="formWrap">
+      <form id="bookForm" novalidate>
+        <div class="fieldset-title">🧑 About you</div>
+        <div class="grid2">
+          <div class="field"><label for="ownerName">Your name</label><input id="ownerName" name="ownerName" type="text" placeholder="Aanya Sharma" required></div>
+          <div class="field"><label for="ownerPhone">Phone</label><input id="ownerPhone" name="ownerPhone" type="tel" placeholder="+91 98XXXXXX21" required></div>
+        </div>
+        <div class="field"><label for="ownerEmail">Email</label><input id="ownerEmail" name="ownerEmail" type="email" placeholder="you@example.com" required></div>
+
+        <div class="fieldset-title" style="margin-top:18px">🐾 About your pet</div>
+        <div class="grid2">
+          <div class="field"><label for="petName">Pet's name</label><input id="petName" name="petName" type="text" placeholder="Biscuit" required></div>
+          <div class="field">
+            <label for="petType">Dog or cat?</label>
+            <select id="petType" name="petType" required>
+              <option value="dog">Dog</option>
+              <option value="cat">Cat</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="breed">Breed <span style="font-weight:500;color:var(--muted)">(top 10)</span></label>
+          <select id="breed" name="breed" required></select>
+        </div>
+
+        <div class="field">
+          <label>Size <span style="font-weight:500;color:var(--muted)">— sets the price</span></label>
+          <div class="seg" id="sizeSeg">
+            <label><input type="radio" name="size" value="small"><span class="chip">Small<small>≤10 kg · ₹600/n</small></span></label>
+            <label><input type="radio" name="size" value="medium" checked><span class="chip">Medium<small>10–25 kg · ₹900/n</small></span></label>
+            <label><input type="radio" name="size" value="large"><span class="chip">Large<small>25 kg+ · ₹1300/n</small></span></label>
+          </div>
+        </div>
+
+        <div class="fieldset-title" style="margin-top:18px">📅 The stay</div>
+        <div class="grid2">
+          <div class="field"><label for="checkin">Check-in</label><input id="checkin" name="checkin" type="date" required></div>
+          <div class="field"><label for="checkout">Check-out</label><input id="checkout" name="checkout" type="date" required></div>
+        </div>
+
+        <div class="summary">
+          <div class="s-lbl"><b id="sumNights">Select dates</b><span id="sumRate">Medium · ₹900/night</span></div>
+          <div class="s-amt" id="sumTotal">₹0<small></small></div>
+        </div>
+
+        <button type="submit" class="btn lg">Confirm booking</button>
+        <p class="hint">No payment now — we'll confirm by call. Free cancellation up to 48h before.</p>
+      </form>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div class="success" id="successWrap" style="display:none">
+      <svg class="check" viewBox="0 0 90 90"><circle cx="45" cy="45" r="42" fill="#EBA876"/><path d="M28 46 L40 58 L64 33" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h2>Room reserved! 🎉</h2>
+      <p id="successMsg">We can't wait to spoil your pet rotten. A confirmation is on its way.</p>
+      <div class="recap" id="recap"></div>
+      <button class="btn lg" id="doneBtn">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN LOGIN ===== -->
+<div class="modal-overlay" id="adminLogin" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="modal login-card">
+    <button class="modal-close" id="loginClose" aria-label="Close">✕</button>
+    <div class="modal-body" style="padding-top:36px">
+      <div class="login-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg></div>
+      <h2 id="loginTitle" style="text-align:center;font-size:1.5rem;font-weight:700">Admin access</h2>
+      <p style="text-align:center;color:var(--muted);font-weight:500;margin:6px 0 20px">Enter the password to manage booking requests.</p>
+      <div class="field"><label for="adminPass">Password</label><input id="adminPass" type="password" placeholder="••••••••••" autocomplete="off"></div>
+      <div class="login-err" id="loginErr"></div>
+      <button class="btn lg" id="loginBtn" style="width:100%">Unlock dashboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN DASHBOARD ===== -->
+<div class="admin-page" id="adminPage">
+  <header class="admin-top">
+    <a href="#" class="brand" style="pointer-events:none">
+      <svg class="paw" viewBox="0 0 48 48" fill="#EBA876"><ellipse cx="24" cy="32" rx="11" ry="9"/><ellipse cx="12" cy="20" rx="4.5" ry="6"/><ellipse cx="20" cy="14" rx="4.5" ry="6"/><ellipse cx="28" cy="14" rx="4.5" ry="6"/><ellipse cx="36" cy="20" rx="4.5" ry="6"/></svg>
+      <span>Paw<b style="color:var(--peach-deep)">nest</b> Admin</span>
+    </a>
+    <a href="#" class="admin-back" id="adminBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Back to Home</a>
+  </header>
+  <div class="admin-body">
+    <div class="admin-tabs">
+      <button class="adm-tab active" data-tab="requests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M3 12h18M3 19h18"/></svg>Requests</button>
+      <button class="adm-tab" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+    </div>
+    <section class="tab-panel active" id="panelRequests">
+    <div class="admin-head-row">
+      <div>
+        <h1>Booking requests</h1>
+        <p>Review incoming stays and approve or reject each one.</p>
+      </div>
+      <div class="admin-stats">
+        <div class="stat-pill pend"><span class="n" id="cPend">0</span><span class="l">Pending</span></div>
+        <div class="stat-pill appr"><span class="n" id="cAppr">0</span><span class="l">Approved</span></div>
+        <div class="stat-pill rej"><span class="n" id="cRej">0</span><span class="l">Rejected</span></div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="req-table">
+        <thead>
+          <tr><th>Pet / Owner</th><th>Contact</th><th>Breed</th><th>Size</th><th>Dates</th><th>Nights</th><th>Total</th><th>Status</th><th>Action</th></tr>
+        </thead>
+        <tbody id="reqTbody"></tbody>
+      </table>
+    </div>
+    <p class="admin-note" id="adminNote">Note: this is a front-end demo dashboard.</p>
+    </section>
+
+    <section class="tab-panel" id="panelSettings">
+      <div class="settings-scroll">
+        <div class="vault-head">
+          <h1>Database connection</h1>
+          <p>Connect Supabase so bookings save to your database and sync across devices. Paste the two values from Supabase → Project Settings → API Keys.</p>
+        </div>
+        <div class="db-card">
+          <div class="db-status off" id="dbStatus">● Not connected</div>
+          <div class="va-field" style="margin-bottom:14px">
+            <label for="sbUrl">Supabase Project URL</label>
+            <input id="sbUrl" placeholder="https://yourproject.supabase.co" autocomplete="off">
+          </div>
+          <div class="va-field" style="margin-bottom:16px">
+            <label for="sbKey">Anon / Publishable key</label>
+            <input id="sbKey" type="password" placeholder="sb_publishable_…  or  eyJ…" autocomplete="off">
+          </div>
+          <div class="db-actions">
+            <button class="btn" id="sbSaveBtn">Save &amp; connect</button>
+            <button class="btn ghost" id="sbClearBtn">Disconnect</button>
+          </div>
+          <div class="db-err" id="sbErr"></div>
+          <p class="db-hint">Use the <b>anon / publishable</b> key (safe for browsers) — never the <b>secret</b> / service-role key. Make sure you ran the table + policy SQL in Supabase first. Saving reloads the page to apply the connection.</p>
+        </div>
+
+        <div class="vault-head" style="margin-top:36px">
+          <h1>Secret vault</h1>
+          <p>Save API keys and tokens for the other platforms you connect — payments, SMS, email, maps, and more.</p>
+        </div>
+        <div class="vault-warning">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          <div><b>Stored in this browser only.</b> These values live in your browser's local storage, unencrypted — anyone with access to this device can read them. This isn't production-grade secret storage. For live secrets, keep them server-side (e.g. Supabase Edge Function secrets or environment variables) and never ship real keys in front-end code.</div>
+        </div>
+        <div class="vault-card">
+          <div class="vault-add">
+            <div class="va-field">
+              <label for="vPlatform">Platform / service</label>
+              <input id="vPlatform" list="vPresets" placeholder="e.g. Razorpay" autocomplete="off">
+              <datalist id="vPresets">
+                <option value="Razorpay"></option><option value="Stripe"></option><option value="Twilio"></option>
+                <option value="SendGrid"></option><option value="Mailgun"></option><option value="WhatsApp Cloud API"></option>
+                <option value="Google Maps"></option><option value="Firebase"></option><option value="OpenAI"></option>
+                <option value="Supabase Service Role"></option>
+              </datalist>
+            </div>
+            <div class="va-field">
+              <label for="vLabel">Key name <span style="font-weight:500;color:var(--muted)">(optional)</span></label>
+              <input id="vLabel" placeholder="e.g. Live secret key" autocomplete="off">
+            </div>
+            <div class="va-field grow">
+              <label for="vValue">API key / token</label>
+              <input id="vValue" type="password" placeholder="Paste the secret…" autocomplete="off">
+            </div>
+            <button class="btn" id="vAddBtn">Add to vault</button>
+          </div>
+          <div class="vault-empty" id="vaultEmpty">No keys saved yet. Add your first one above.</div>
+          <div class="vault-list" id="vaultList"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ---- breed data ---- */
+const BREEDS = {
+  dog:["Labrador Retriever","Golden Retriever","German Shepherd","French Bulldog","Beagle","Poodle","Rottweiler","Pug","Shih Tzu","Indian Pariah (Indie)"],
+  cat:["Persian","Maine Coon","Siamese","Bengal","British Shorthair","Ragdoll","Sphynx","Scottish Fold","Abyssinian","Indian Domestic Shorthair"]
+};
+const RATES = {small:600, medium:900, large:1300};
+const SIZE_LABEL = {small:"Small", medium:"Medium", large:"Large"};
+
+/* ---- elements ---- */
+const modal = document.getElementById('modal');
+const formWrap = document.getElementById('formWrap');
+const successWrap = document.getElementById('successWrap');
+const form = document.getElementById('bookForm');
+const petType = document.getElementById('petType');
+const breed = document.getElementById('breed');
+const checkin = document.getElementById('checkin');
+const checkout = document.getElementById('checkout');
+const sumNights = document.getElementById('sumNights');
+const sumRate = document.getElementById('sumRate');
+const sumTotal = document.getElementById('sumTotal');
+let lastFocused = null;
+
+/* ---- nav burger ---- */
+const navlinks = document.getElementById('navlinks');
+document.getElementById('menuToggle').addEventListener('click', ()=> navlinks.classList.toggle('open'));
+navlinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>navlinks.classList.remove('open')));
+
+/* ---- breed dropdown population ---- */
+function fillBreeds(){
+  const list = BREEDS[petType.value];
+  breed.innerHTML = '<option value="" disabled selected>Choose a breed…</option>' +
+    list.map(b=>`<option value="${b}">${b}</option>`).join('') +
+    '<option value="Mixed / Other">Mixed / Other</option>';
+}
+petType.addEventListener('change', fillBreeds);
+fillBreeds();
+
+/* auto-capitalize the first letter of each word in the name + pet fields */
+const titleCase = s => s.replace(/\b\p{L}/gu, c => c.toUpperCase());
+['ownerName','petName'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('blur', ()=>{ el.value = titleCase(el.value); });
+});
+
+/* when a breed is picked, scroll the popup down to reveal the rest of the form + CTA */
+breed.addEventListener('change', ()=>{
+  if(!breed.value) return;
+  const overlay = document.getElementById('modal');
+  requestAnimationFrame(()=>{
+    overlay.scrollTo({ top: overlay.scrollHeight, behavior:'smooth' });
+  });
+});
+
+/* ---- date defaults & constraints ---- */
+function todayStr(d=0){
+  const t = new Date(); t.setDate(t.getDate()+d);
+  return t.toISOString().split('T')[0];
+}
+checkin.min = todayStr(0);
+checkout.min = todayStr(1);
+checkin.value = todayStr(1);
+checkout.value = todayStr(3);
+
+checkin.addEventListener('change', ()=>{
+  const next = new Date(checkin.value); next.setDate(next.getDate()+1);
+  checkout.min = next.toISOString().split('T')[0];
+  if(new Date(checkout.value) <= new Date(checkin.value)) checkout.value = checkout.min;
+  updateSummary();
+});
+
+/* ---- live price ---- */
+function nightsBetween(){
+  const a = new Date(checkin.value), b = new Date(checkout.value);
+  if(isNaN(a)||isNaN(b)) return 0;
+  const n = Math.round((b-a)/86400000);
+  return n>0 ? n : 0;
+}
+function selectedSize(){
+  const r = form.querySelector('input[name="size"]:checked');
+  return r ? r.value : 'medium';
+}
+function updateSummary(){
+  const size = selectedSize();
+  const rate = RATES[size];
+  const n = nightsBetween();
+  sumRate.textContent = `${SIZE_LABEL[size]} · ₹${rate.toLocaleString('en-IN')}/night`;
+  if(n>0){
+    sumNights.textContent = `${n} night${n>1?'s':''}`;
+    sumTotal.innerHTML = `₹${(rate*n).toLocaleString('en-IN')}<small></small>`;
+  }else{
+    sumNights.textContent = 'Select valid dates';
+    sumTotal.innerHTML = `₹0<small></small>`;
+  }
+}
+form.querySelectorAll('input[name="size"]').forEach(r=>r.addEventListener('change', updateSummary));
+checkout.addEventListener('change', updateSummary);
+updateSummary();
+
+/* ---- open / close modal ---- */
+function openModal(presetSize){
+  lastFocused = document.activeElement;
+  if(presetSize){
+    const r = form.querySelector(`input[name="size"][value="${presetSize}"]`);
+    if(r){ r.checked = true; updateSummary(); }
+  }
+  formWrap.style.display='block';
+  successWrap.style.display='none';
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('ownerName').focus(), 250);
+}
+function closeModal(){
+  modal.classList.remove('open');
+  document.body.style.overflow='';
+  if(lastFocused) lastFocused.focus();
+}
+document.querySelectorAll('.book-btn').forEach(b=>{
+  b.addEventListener('click', ()=> openModal(b.dataset.size));
+});
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('doneBtn').addEventListener('click', closeModal);
+modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && modal.classList.contains('open')) closeModal(); });
+
+/* ---- simple focus trap ---- */
+modal.addEventListener('keydown', e=>{
+  if(e.key!=='Tab') return;
+  const f = modal.querySelectorAll('input,select,button,a[href]');
+  const list = Array.from(f).filter(el=>el.offsetParent!==null);
+  if(!list.length) return;
+  const first=list[0], last=list[list.length-1];
+  if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+});
+
+/* ---- validation + submit ---- */
+form.addEventListener('submit', e=>{
+  e.preventDefault();
+  ['ownerName','petName'].forEach(id=>{ const el=document.getElementById(id); el.value = titleCase(el.value); });
+  let ok = true;
+  const required = ['ownerName','ownerPhone','ownerEmail','petName','breed'];
+  required.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el.value.trim()){ el.classList.add('err'); ok=false; } else el.classList.remove('err');
+  });
+  const email = document.getElementById('ownerEmail');
+  if(email.value && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value)){ email.classList.add('err'); ok=false; }
+  if(nightsBetween()<1){ checkout.classList.add('err'); ok=false; } else checkout.classList.remove('err');
+  if(!ok){
+    const firstErr = form.querySelector('.err');
+    if(firstErr) firstErr.focus();
+    return;
+  }
+
+  const size = selectedSize(), n = nightsBetween(), total = RATES[size]*n;
+  dbInsert({
+    owner:document.getElementById('ownerName').value.trim(),
+    phone:document.getElementById('ownerPhone').value.trim(),
+    email:document.getElementById('ownerEmail').value.trim(),
+    pet:document.getElementById('petName').value.trim(),
+    type:petType.value, breed:breed.value, size,
+    checkin:checkin.value, checkout:checkout.value, nights:n, total, status:'pending'
+  });
+  document.getElementById('successMsg').textContent =
+    `${document.getElementById('petName').value.trim()} is booked in for a cage-free, cuddle-filled stay. A confirmation call is on its way!`;
+  document.getElementById('recap').innerHTML = `
+    <div>Pet<span>${document.getElementById('petName').value.trim()} · ${breed.value}</span></div>
+    <div>Size<span>${SIZE_LABEL[size]}</span></div>
+    <div>Check-in<span>${formatDate(checkin.value)}</span></div>
+    <div>Check-out<span>${formatDate(checkout.value)}</span></div>
+    <div>Nights<span>${n}</span></div>
+    <div style="border-top:1px solid var(--line);margin-top:6px;padding-top:10px;font-family:'Fredoka';font-size:1.1rem">Total<span style="color:var(--peach-deep)">₹${total.toLocaleString('en-IN')}</span></div>`;
+  formWrap.style.display='none';
+  successWrap.style.display='block';
+  modal.querySelector('.modal').scrollTop = 0;
+});
+function formatDate(s){
+  const d = new Date(s);
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+}
+function formatDateShort(s){
+  const d = new Date(s);
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+}
+/* clear error on input */
+form.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>el.classList.remove('err')));
+
+/* ---- active nav on scroll ---- */
+const sections = ['home','promise','how','pricing','gallery'].map(id=>document.getElementById(id));
+const navAnchors = navlinks.querySelectorAll('a');
+window.addEventListener('scroll', ()=>{
+  let cur = 'home';
+  sections.forEach(s=>{ if(s && s.getBoundingClientRect().top < 200) cur = s.id; });
+  navAnchors.forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+cur));
+});
+
+/* ===================== DATA LAYER (Supabase + local fallback) ===================== */
+/*
+  SUPABASE SETUP
+  1) Create a project at https://supabase.com and open SQL Editor.
+  2) Run this SQL to create the table + demo access policies:
+
+     create table public.bookings (
+       id uuid primary key default gen_random_uuid(),
+       created_at timestamptz default now(),
+       owner text, phone text, email text,
+       pet text, type text, breed text, size text,
+       checkin date, checkout date,
+       nights int, total int,
+       status text default 'pending'
+     );
+     alter table public.bookings enable row level security;
+     create policy "anon insert" on public.bookings for insert to anon with check (true);
+     create policy "anon select" on public.bookings for select to anon using (true);
+     create policy "anon update" on public.bookings for update to anon using (true) with check (true);
+
+  3) In Project Settings -> API, copy the Project URL and the anon/public key
+     and paste them below. (The anon key is safe to expose in the browser.)
+*/
+const SUPABASE_URL_DEFAULT = 'YOUR_SUPABASE_PROJECT_URL';   // optional: hardcode here…
+const SUPABASE_ANON_KEY_DEFAULT = 'YOUR_SUPABASE_ANON_KEY'; // …or set both in Admin → Settings → Database
+
+const SB_CFG_KEY = 'pawnest_sb_config';
+function loadSbCfg(){
+  try{ const r=localStorage.getItem(SB_CFG_KEY); if(r){ const o=JSON.parse(r); return { url:(o.url||''), key:(o.key||'') }; } }catch(e){}
+  return { url:'', key:'' };
+}
+const _sbCfg = loadSbCfg();
+const SUPABASE_URL = _sbCfg.url || SUPABASE_URL_DEFAULT;
+const SUPABASE_ANON_KEY = _sbCfg.key || SUPABASE_ANON_KEY_DEFAULT;
+
+const SB = (window.supabase && /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 20)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+const USING_SB = !!SB;
+
+const STORE_KEY='pawnest_bookings';
+function localLoad(){ try{ const r=localStorage.getItem(STORE_KEY); if(r) return JSON.parse(r); }catch(e){} return null; }
+function localSave(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(bookings)); }catch(e){} }
+
+const SEED=[
+  {id:'bk1',owner:'Aanya Sharma',phone:'+91 98450 11223',email:'aanya.s@gmail.com',pet:'Biscuit',type:'dog',breed:'Beagle',size:'medium',checkin:'2026-06-22',checkout:'2026-06-26',nights:4,total:3600,status:'pending'},
+  {id:'bk2',owner:'Rohan Mehta',phone:'+91 99020 44567',email:'rohan.mehta@outlook.com',pet:'Simba',type:'cat',breed:'Persian',size:'small',checkin:'2026-06-25',checkout:'2026-06-28',nights:3,total:1800,status:'pending'},
+  {id:'bk3',owner:'Fatima Khan',phone:'+91 90080 76543',email:'fatima.k@yahoo.com',pet:'Bruno',type:'dog',breed:'Labrador Retriever',size:'large',checkin:'2026-07-01',checkout:'2026-07-05',nights:4,total:5200,status:'approved'},
+  {id:'bk4',owner:'Karthik Iyer',phone:'+91 97410 22980',email:'karthik.iyer@gmail.com',pet:'Mochi',type:'cat',breed:'Indian Domestic Shorthair',size:'small',checkin:'2026-06-21',checkout:'2026-06-23',nights:2,total:1200,status:'pending'},
+  {id:'bk5',owner:'Neha Verma',phone:'+91 98860 33215',email:'neha.verma@gmail.com',pet:'Coco',type:'dog',breed:'Pug',size:'small',checkin:'2026-06-20',checkout:'2026-06-21',nights:1,total:600,status:'rejected'}
+];
+
+let bookings = [];
+
+async function dbFetch(){
+  if(SB){
+    const { data, error } = await SB.from('bookings').select('*').order('created_at',{ascending:false});
+    if(error){ console.warn('Supabase fetch failed:', error.message); return localLoad() || []; }
+    return data || [];
+  }
+  const local = localLoad();
+  if(local) return local;
+  bookings = SEED.slice(); localSave(); return bookings;
+}
+async function dbInsert(rec){
+  if(SB){
+    const { error } = await SB.from('bookings').insert(rec);
+    if(error) console.warn('Supabase insert failed (emails will still send):', error.message);
+    /* send owner notification + customer acknowledgement via the Gmail Edge Function,
+       regardless of whether the row saved, so a form booking always emails */
+    try{
+      const { error: fnErr } = await SB.functions.invoke('send-booking-emails', { body: rec });
+      if(fnErr) console.warn('Email function error:', fnErr.message || fnErr);
+    }catch(e){ console.warn('Email invoke failed:', e); }
+    return;
+  }
+  bookings.unshift({ ...rec, id:'bk'+Date.now() });
+  localSave();
+}
+async function dbUpdateStatus(id, status){
+  if(SB){
+    const { error } = await SB.from('bookings').update({ status }).eq('id', id);
+    if(error) console.warn('Supabase update failed:', error.message);
+    return;
+  }
+  const b = bookings.find(x=>String(x.id)===String(id));
+  if(b){ b.status = status; localSave(); }
+}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function cap(s){return s? s.charAt(0).toUpperCase()+s.slice(1):s;}
+/* revoke is allowed up to 2 hours before check-in (drop-off 10 AM, so cutoff 8 AM on check-in day) */
+function canRevoke(checkin){
+  if(!checkin) return true;
+  const cutoff = new Date(checkin + 'T08:00:00');
+  if(isNaN(cutoff)) return true;
+  return new Date() < cutoff;
+}
+function renderAdmin(){
+  const tb=document.getElementById('reqTbody');
+  let p=0,a=0,r=0;
+  if(!bookings.length){
+    tb.innerHTML='<tr class="empty-row"><td colspan="9">No booking requests yet. New bookings from the site will show up here.</td></tr>';
+  }else{
+    tb.innerHTML=bookings.map(b=>{
+      if(b.status==='pending')p++; else if(b.status==='approved')a++; else r++;
+      let actionCell;
+      if(b.status==='pending'){
+        actionCell = `<div class="act">
+          <button class="approve" data-act="approve" data-id="${b.id}">✓ Approve</button>
+          <button class="reject" data-act="reject" data-id="${b.id}">✕ Reject</button>
+        </div>`;
+      }else{
+        const ok = canRevoke(b.checkin);
+        actionCell = `<div class="act act-revoke">
+          <button class="revoke" data-act="revoke" data-id="${b.id}" ${ok?'':'disabled'} title="${ok?'Revert to pending':'Revoke window has closed'}">⟲ Revoke</button>
+          <span class="revoke-note">${ok ? 'Revoke allowed up to 2 hrs before check-in (by 8 AM, drop-off 10 AM)' : 'Revoke window closed (within 2 hrs of check-in)'}</span>
+        </div>`;
+      }
+      return `<tr>
+        <td><div class="req-pet">${esc(b.pet)}</div><div class="req-sub">${esc(b.owner)}</div></td>
+        <td>${esc(b.phone)}<div class="req-sub">${esc(b.email)}</div></td>
+        <td>${esc(b.breed)}<div class="req-sub">${esc(cap(b.type))}</div></td>
+        <td>${esc(cap(b.size))}</td>
+        <td>${formatDateShort(b.checkin)} <span style="color:var(--muted)">→</span> ${formatDate(b.checkout)}</td>
+        <td>${b.nights}</td>
+        <td>₹${Number(b.total).toLocaleString('en-IN')}</td>
+        <td><span class="badge ${b.status}">${b.status}</span></td>
+        <td>${actionCell}</td>
+      </tr>`;
+    }).join('');
+  }
+  document.getElementById('cPend').textContent=p;
+  document.getElementById('cAppr').textContent=a;
+  document.getElementById('cRej').textContent=r;
+}
+document.getElementById('reqTbody').addEventListener('click', async e=>{
+  const btn=e.target.closest('button[data-act]'); if(!btn || btn.disabled) return;
+  const b=bookings.find(x=>String(x.id)===String(btn.dataset.id)); if(!b) return;
+  const act = btn.dataset.act;
+  // guard: revoke only within the allowed window
+  if(act==='revoke' && !canRevoke(b.checkin)){ renderAdmin(); return; }
+  const newStatus = act==='approve' ? 'approved' : act==='reject' ? 'rejected' : 'pending';
+  b.status = newStatus; renderAdmin();          // optimistic update
+  await dbUpdateStatus(b.id, newStatus);          // persist
+  // email the customer only when approved or rejected (revoke is silent)
+  if((newStatus==='approved' || newStatus==='rejected') && SB){
+    try{
+      const { error } = await SB.functions.invoke('send-booking-emails', { body: { ...b, type:newStatus } });
+      if(error) console.warn('Status email error:', error.message || error);
+    }catch(err){ console.warn('Status email failed:', err); }
+  }
+});
+
+/* ---- gating ---- */
+const ADMIN_PW='pawsandfriends2024';
+let adminUnlocked=false;
+const adminLogin=document.getElementById('adminLogin');
+const adminPage=document.getElementById('adminPage');
+const adminPass=document.getElementById('adminPass');
+const loginErr=document.getElementById('loginErr');
+
+function openAdminGate(){
+  if(adminUnlocked){ showAdmin(); return; }
+  adminLogin.classList.add('open'); document.body.style.overflow='hidden';
+  loginErr.textContent=''; adminPass.value=''; adminPass.classList.remove('err');
+  setTimeout(()=>adminPass.focus(),250);
+}
+function closeLogin(){ adminLogin.classList.remove('open'); document.body.style.overflow=''; }
+function tryLogin(){
+  if(adminPass.value===ADMIN_PW){ adminUnlocked=true; closeLogin(); showAdmin(); }
+  else{ loginErr.textContent='Incorrect password. Please try again.'; adminPass.classList.add('err'); adminPass.focus(); adminPass.select(); }
+}
+async function showAdmin(){
+  adminPage.classList.add('open');
+  document.body.style.overflow='hidden'; document.documentElement.style.overflow='hidden';
+  adminPage.scrollTop=0;
+  switchTab('requests');
+  document.getElementById('reqTbody').innerHTML='<tr class="empty-row"><td colspan="9">Loading requests…</td></tr>';
+  bookings = await dbFetch();
+  renderAdmin();
+}
+function hideAdmin(){ adminPage.classList.remove('open'); document.body.style.overflow=''; document.documentElement.style.overflow=''; }
+
+/* connection-mode note */
+document.getElementById('adminNote').textContent = USING_SB
+  ? '● Connected to Supabase — bookings and approvals are saved to your database and sync across every device. Refresh to pull the latest.'
+  : '● Local demo mode — no Supabase keys set yet. Bookings save in this browser only. Add your Supabase URL + anon key near the top of the script to sync across devices.';
+
+/* ---- admin tabs ---- */
+const admTabs=document.querySelectorAll('.adm-tab');
+function switchTab(id){
+  admTabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===id));
+  document.getElementById('panelRequests').classList.toggle('active', id==='requests');
+  document.getElementById('panelSettings').classList.toggle('active', id==='settings');
+  if(id==='settings') renderVault();
+}
+admTabs.forEach(t=>t.addEventListener('click', ()=>switchTab(t.dataset.tab)));
+
+/* ---- secret vault ---- */
+const VAULT_KEY='pawnest_vault';
+let vault=[];
+function vaultLoad(){ try{ const r=localStorage.getItem(VAULT_KEY); vault = r?JSON.parse(r):[]; }catch(e){ vault=[]; } }
+function vaultSave(){ try{ localStorage.setItem(VAULT_KEY, JSON.stringify(vault)); }catch(e){} }
+function maskVal(v){ return v.length<=4 ? '••••' : '•'.repeat(Math.min(12, v.length-4))+v.slice(-4); }
+function renderVault(){
+  const list=document.getElementById('vaultList');
+  document.getElementById('vaultEmpty').style.display = vault.length ? 'none' : 'block';
+  list.innerHTML = vault.map(v=>`
+    <div class="vault-row" data-id="${v.id}">
+      <div class="vault-platform"><span class="dot"></span><span>${esc(v.platform)}${v.label?`<small>${esc(v.label)}</small>`:''}</span></div>
+      <span class="vault-val" data-shown="0">${maskVal(v.value)}</span>
+      <div class="vault-actions">
+        <button data-vact="reveal" title="Show / hide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <button data-vact="copy" title="Copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        <button class="del" data-vact="delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+      </div>
+    </div>`).join('');
+}
+function vaultAdd(){
+  const pEl=document.getElementById('vPlatform'), lEl=document.getElementById('vLabel'), kEl=document.getElementById('vValue');
+  const platform=pEl.value.trim(), label=lEl.value.trim(), value=kEl.value.trim();
+  if(!platform){ pEl.focus(); return; }
+  if(!value){ kEl.focus(); return; }
+  vault.unshift({ id:'v'+Date.now(), platform, label, value });
+  vaultSave(); renderVault();
+  pEl.value=''; lEl.value=''; kEl.value=''; pEl.focus();
+}
+document.getElementById('vAddBtn').addEventListener('click', vaultAdd);
+document.getElementById('vValue').addEventListener('keydown', e=>{ if(e.key==='Enter') vaultAdd(); });
+document.getElementById('vaultList').addEventListener('click', async e=>{
+  const btn=e.target.closest('button[data-vact]'); if(!btn) return;
+  const row=btn.closest('.vault-row'); const entry=vault.find(v=>v.id===row.dataset.id); if(!entry) return;
+  if(btn.dataset.vact==='reveal'){
+    const span=row.querySelector('.vault-val'); const shown=span.dataset.shown==='1';
+    span.textContent = shown ? maskVal(entry.value) : entry.value; span.dataset.shown = shown?'0':'1';
+  } else if(btn.dataset.vact==='copy'){
+    try{ await navigator.clipboard.writeText(entry.value); btn.classList.add('ok'); setTimeout(()=>btn.classList.remove('ok'),900); }catch(e){}
+  } else if(btn.dataset.vact==='delete'){
+    if(confirm(`Delete the ${entry.platform} key from the vault?`)){ vault=vault.filter(v=>v.id!==entry.id); vaultSave(); renderVault(); }
+  }
+});
+vaultLoad();
+
+/* ---- Supabase connection settings ---- */
+(function(){
+  const cfg = loadSbCfg();
+  const urlEl = document.getElementById('sbUrl');
+  const keyEl = document.getElementById('sbKey');
+  const st = document.getElementById('dbStatus');
+  if(cfg.url) urlEl.value = cfg.url;
+  if(cfg.key) keyEl.value = cfg.key;
+  st.className = 'db-status ' + (USING_SB ? 'on' : 'off');
+  st.textContent = USING_SB ? '● Connected to Supabase' : '● Not connected';
+})();
+document.getElementById('sbSaveBtn').addEventListener('click', ()=>{
+  const url = document.getElementById('sbUrl').value.trim().replace(/\/+$/,'');
+  const key = document.getElementById('sbKey').value.trim();
+  const err = document.getElementById('sbErr');
+  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)){
+    err.textContent = 'URL must look like https://yourproject.supabase.co (no extra path).'; return;
+  }
+  if(key.length < 20){
+    err.textContent = 'That key looks too short — paste the full anon / publishable key.'; return;
+  }
+  try{ localStorage.setItem(SB_CFG_KEY, JSON.stringify({ url, key })); }
+  catch(e){ err.textContent = 'Could not save — browser storage is blocked.'; return; }
+  err.textContent = '';
+  location.reload();
+});
+document.getElementById('sbClearBtn').addEventListener('click', ()=>{
+  try{ localStorage.removeItem(SB_CFG_KEY); }catch(e){}
+  location.reload();
+});
+
+document.getElementById('adminLink').addEventListener('click', e=>{ e.preventDefault(); navlinks.classList.remove('open'); openAdminGate(); });
+document.getElementById('loginBtn').addEventListener('click', tryLogin);
+document.getElementById('loginClose').addEventListener('click', closeLogin);
+adminLogin.addEventListener('click', e=>{ if(e.target===adminLogin) closeLogin(); });
+adminPass.addEventListener('keydown', e=>{ if(e.key==='Enter'){ tryLogin(); } else { loginErr.textContent=''; adminPass.classList.remove('err'); } });
+document.getElementById('adminBack').addEventListener('click', e=>{ e.preventDefault(); hideAdmin(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && adminLogin.classList.contains('open')) closeLogin(); });
+</script>
+</body>
+</html>
